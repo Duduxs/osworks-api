@@ -1,24 +1,57 @@
 package com.edudev.osworksapi.controller;
 
-import java.util.Arrays;
+import java.net.URI;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.edudev.osworksapi.model.Client;
+import com.edudev.osworksapi.service.ClientService;
+
 
 @RestController
-@RequestMapping(value="clients")
+@RequestMapping(value="/clients")
 public class ClientController {
-
+	
+	@Autowired
+	private ClientService clientService;
+	
 	@GetMapping
 	public ResponseEntity<List<Client>> list(){
-		Client c1 = new Client(1L, "Eduardo", "duduxss3@gmail.com", "(81) 98739-5261");
-		Client c2 = new Client(2L, "Ednaldo Pereira", "Ed23@bol.com", "(81) 8658-7263");
-		
-		return ResponseEntity.ok().body(Arrays.asList(c1,c2));
+		return ResponseEntity.ok().body(clientService.findAll());
+	}
+	
+	@GetMapping(value="/{id}")
+	public ResponseEntity<Client> findById(@PathVariable Long id){
+		return ResponseEntity.ok().body(clientService.findById(id));
+	}
+	
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	public ResponseEntity<Client> insert(Client client){
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(client.getId()).toUri();
+		return ResponseEntity.created(uri).body(clientService.save(client));
+	}
+	
+	@PutMapping(value="/{id}")
+	public ResponseEntity<Client> update(@PathVariable Long id, Client client){
+		return ResponseEntity.ok().body(clientService.update(client));
+	}
+	
+	@DeleteMapping(value="/{id}")
+	public ResponseEntity<Void> delete(@PathVariable Long id){
+		clientService.delete(id);
+		return ResponseEntity.noContent().build();
 	}
 }
