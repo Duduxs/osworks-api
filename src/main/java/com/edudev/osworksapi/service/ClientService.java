@@ -27,6 +27,7 @@ public class ClientService {
 	
 	public Client save(Client client) {
 		return clientRepository.save(client);
+		
 	}
 	
 	public Client update(Client client) {
